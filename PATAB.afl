@@ -1,0 +1,113 @@
+
+
+//Khai bao
+
+hhvv = HighestVisibleValue( V );
+minv = -hhvv / 50;
+upday = C > Ref( C, -1 );
+///////////////////////////////////////////////////
+global IDset;
+if(typeof(IDset)=="undefined") IDset = 0;
+//GuiButton
+
+function GuiButtonTrigger(ButtonName,x,y,width,height){
+
+GuiButton(ButtonName,++IDset,x,y,width,height,1);
+
+id = GuiGetEvent(0,0);
+event = GuiGetEvent(0,1);
+clickevent = event == 1;
+ButtonClicked = id == IDset && clickevent;
+
+return ButtonClicked;
+}
+click = GetCursorMouseButtons() == 9;
+Px = GetCursorXPosition( 1 );
+Py = GetCursorYPosition( 1 );
+
+GfxSetBkMode( 1 );
+
+///////////////////////////////////////////////////
+//1. Them chart vao do thi
+_SECTION_BEGIN( "Price Chart" );
+GraphLabelDecimals = 2;
+SetChartOptions( 0, chartShowArrows | chartShowDates );
+
+//Chart
+
+TypeofPrice = ParamList( "Type of Price", "Candle Stick,Bar Chart", 0 );
+
+switch( TypeofPrice )
+{
+case "Candle Stick":
+    upcolor = ParamColor( "Up color", colorWhite );
+    downcolor = ParamColor( "Down color", colorBlack );
+    barcolor = ParamColor( "Bar color", colorBlack );
+    SetBarFillColor( IIf( C > O, upcolor, downcolor ) );
+    PlotOHLC( Open, High, Low, Close, " ", barcolor, styleCandle + styleNoTitle, minv, hhvv * 9 );
+    GraphXSpace = 15;
+    break;
+
+case "Bar Chart":
+    BarColor = IIf( C > Ref( C, -1 ), ColorRGB( 46, 82, 173 ), ColorRGB( 238, 82, 160 ) );
+    PlotOHLC( Close,  High,  Low,  Close, "", BarColor, styleBar + styleThick, minv, hhvv * 9, 0, 0, 2 );
+
+    break;
+
+
+}
+
+_SECTION_END();
+
+///////////////////////////////////////////////////
+// 2. Them EMA vao do thi
+_SECTION_BEGIN( "EMA" );
+
+ema1 = Param( "Chu Ky", 21, 1, 200, 1 );
+Plot( EMA( C, ema1 ), "EMA" + ema1, colorRed, styleThick );
+
+_SECTION_END();
+
+//////////////////////////////////////////////////
+
+_SECTION_BEGIN( "Volume" );
+//Khong phan biet hoa thuong
+//Them volume vao do thi
+Vdn = IIf( C < Ref( C, -1 ), V, 0 );
+Vup = IIf( C > Ref( C, -1 ), V, 0 );
+hvup10 = HHV( vup, 10 );
+hv10 = HHV( vdn, 10 );
+VAV = MA( V, Param( "TB Vol", 30, 1, 200, 1 ) );
+
+TypeofVol = ParamList( "Type of Volume", "Pivot Pocket, Standard", 0 );
+
+switch( TypeofVol )
+{
+
+
+
+case "Pivot Pocket":
+    color = IIf( C > Ref( C, -1 ) AND V < hv10, ParamColor( "Volume up", colorGreen ),
+                 IIf( C > Ref( C, -1 ) AND V > hv10, ParamColor( "Pivot Pocket", colorBrightGreen ),
+                      IIf( C < Ref( C, -1 ) AND V > hvup10, ParamColor( "Max Volumn down", ColorRGB( 0, 253, 251 ) ), ParamColor( "Volume down", colorred ) ) ) );
+
+    break;
+
+case "Standard":
+    color = IIf( C >= Ref( C, -1 ), ParamColor( "Volume up", colorGreen ), ParamColor( "Volume down", colorred ) );
+
+
+    break;
+
+}
+
+//Plot Volume and Caculator Vol 30
+
+SetBarFillColor( color );
+Plot( V, _DEFAULT_NAME(), ParamColor( "color Volume", colorWhite ), styleArea | styleOwnScale | styleNoLabel, minv, hhvv * 9 );
+CHANGE = ( ( C - Ref( C, -1 ) ) / Ref( C, -1 ) ) * 100;
+Plot( VAV, "Vol TB 30 Day", colorBlue, styleLine | styleOwnScale | styleNoLabel, minv, hhvv * 7, 0, 10 );
+
+_SECTION_END();
+
+
