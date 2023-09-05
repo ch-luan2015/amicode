@@ -62,7 +62,6 @@ for ( i = 0; i< asset_count; i++ )
 //}
     }
  
-                     
 }
 
 
@@ -105,7 +104,6 @@ for ( i = 0; i< wl_count; i++ )
     }
     }
  
-                     
 }
 
 bi = BarIndex();

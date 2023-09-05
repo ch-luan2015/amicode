@@ -1,11 +1,12 @@
-
-
 //Khai bao
 // Khai bao list co phieu dang giu
 Myasset = ParamStr("My Asset","EIB,24.7,22.3,24.8|VCG,27.9,26.3,27.5|KDH,36.4,35.05");
+Mywl = ParamStr("My watchlist","BAF,24.5|PLX,41.1|SBT,15.91|TCD,8.89");
+
 hhvv = HighestVisibleValue( V );
 minv = -hhvv / 50;
 upday = C > Ref( C, -1 );
+
 ///////////////////////////////////////////////////
 global IDset;
 if(typeof(IDset)=="undefined") IDset = 0;
@@ -264,6 +265,45 @@ else
 GuiSetText( "Off", IDset );
 GuiSetColors(IDset,IDset,1,colorWhite, colorRed, colorYellow, colorWhite, colorGreen, colorYellow, colorGold, colorDarkTeal, colorYellow );
 }
+
+///////////////////////////////////////////////////
+//Draw line entry-stoploss-target on chart
+asset_count = StrCount(Myasset, "|")+1;
+wl_count = StrCount(Mywl, "|")+1;
+
+for(i = 0; i<asset_count ; i++ ){
+
+	list = StrExtract( Myasset, i, '|' );
+
+	symbol = StrExtract( list, 0, ',' ) ;
+    Giamua = StrExtract( list, 1, ',' ) ;
+    Stoploss = StrExtract( list, 2, ',' ) ;
+    Target = StrExtract( list, 3, ',' ) ;
+ 
+	SetForeign(symbol);
+	fc= LastValue(close);
+	rfc = ROC(fc,1);
+	RestorePriceArrays();
+	PnL = (fc - StrToNum(giamua))/StrToNum(giamua)*100;
+	
+	if(Name()==symbol){
+	
+	  line_sl = LineArray(BarCount-13,StrToNum(Stoploss),BarCount,StrToNum(Stoploss),1);
+	  
+	  TargetNum = IIf(StrToNum(Target)!=0,StrToNum(Target),fc);
+	  
+	  line_target = LineArray(BarCount-13,TargetNum,BarCount,TargetNum,1);
+      
+      line_entry = LineArray(BarCount-13,StrToNum(giamua),BarCount,StrToNum(giamua),1);
+      
+		Plot(line_entry,"Entry",colorBlue,styleThick+styleDashed,Null,Null,5);
+		Plot(line_sl,"Stoploss",colorRed,styleThick+styleDashed,Null,Null,5);
+		Plot(line_target,"Target",colorgreen,styleThick+styleDashed,Null,Null,5);
+	}
+ 
+}
+
+
 
 
 ///////////////////////////////////////////////////
