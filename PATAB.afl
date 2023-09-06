@@ -1,7 +1,7 @@
 //Khai bao
 // Khai bao list co phieu dang giu
 Myasset = ParamStr( "My Asset", "EIB,24.7,22.3,24.8|VCG,27.9,26.3,27.5|KDH,36.4,35.05" );
-MyWL = ParamStr( "My Watchlist", "CTG|DIG|KDH|BCG|KBC|HSG|DPM|DCM|SGP|VTP" );
+MyWL = ParamStr( "My Watchlist", "STB|OCB|CTG|MBB|SHB|MSB|HDC|KHG|PDR|DIG|DXG|C4G|IJC| CII|DPG|DTD|BCG|SZC|VGC|PHR|GVR|IDC| HAX|MWG|PET|TAR|LTG|IDI|VHC| TNG|GIL|VGT|DCM|DPM| CSV|LAS" );
 
 hhvv = HighestVisibleValue( V );
 minv = -hhvv / 50;
