@@ -1,7 +1,7 @@
 //Khai bao
 // Khai bao list co phieu dang giu
 Myasset = ParamStr( "My Asset", "EIB,24.7,22.3,24.8|VCG,27.9,26.3,27.5|KDH,36.4,35.05" );
-MyWL = ParamStr( "My Watchlist", "STB|OCB|CTG|MBB|SHB|MSB|HDC|KHG|PDR|DIG|DXG|C4G|IJC| CII|DPG|DTD|BCG|SZC|VGC|PHR|GVR|IDC| HAX|MWG|PET|TAR|LTG|IDI|VHC| TNG|GIL|VGT|DCM|DPM| CSV|LAS" );
+MyWL = ParamStr( "My Watchlist", "STB|BCG|VCG|SSI" );
 
 hhvv = HighestVisibleValue( V );
 minv = -hhvv / 50;
@@ -57,7 +57,7 @@ if( typeof( IDset ) == "undefined" ) IDset = 0;
 CellHeight = Param( "Cell Height", 22, 0, 100, 1 );
 CellWidth = Param( "Cell Width", 79, 0, 200, 1 );
 start_x = Param( "Vi tri Table X", 0, 0, 2000, 1 );
-start_y = Param( "Vi tri Table Y", 23, 0, 500, 1 );
+start_y = Param( "Vi tri Table Y", 32, 0, 500, 1 );
 BtnOffsetXY = 1;
 x1 = start_x;
 y1 = start_y;
@@ -442,10 +442,12 @@ else
 
 
 ///////////////////////////////////////////////////
-//1. Them chart vao do thi
+//1. Ve Chart Chinh
 _SECTION_BEGIN( "Price Chart" );
 GraphLabelDecimals = 2;
 SetChartOptions( 0, chartShowArrows | chartShowDates );
+
+_N(Title = " "+EncodeColor(colorBlue)+ Name() + " - "+EncodeColor(colorBlue)+FullName()+ " - "+ EncodeColor(colorViolet)+IndustryID(1) +" - "+ MarketID(1) + EncodeColor(colorGreen)+ " - C:  "+WriteVal(C,1.2)+"  "+ " ("+ WriteVal( ROC( C, 1),1.1)+"%) "+ EncodeColor(colorGrey40)+  "  , V:  " + EncodeColor(colorDarkGreen)+WriteVal(V,1.0));
 
 //Type Chart
 TypeofPrice = ParamList( "Type of Price", "Candle Stick,Bar Chart", 0 );
@@ -628,16 +630,11 @@ for ( x = 0 ; x < 1 ; x++ )
                  SymbolNum++;
                   SetForeign (sym);
 /////////////////////
-Timeframe  = ParamList("Time frame","5m,15m,Hourly,Weekly,Monthly",3);
+Timeframe  = ParamList("Time frame","Hourly,Weekly,Monthly",3);
 
 switch(Timeframe)
 {
-	case "5m":
-	TimeFrameSet(in5Minute);
-	break;
-	case "15m":
-	TimeFrameSet(in15Minute);
-	break;
+
 	case "Hourly":
 	TimeFrameSet(inHourly);
 	break;
@@ -723,7 +720,7 @@ vold = V;
                  tEMAlast = EMAT[FirstBar];
                  lEMAlast = EMALong[FirstBar];
                  vEMAlast = EMAVol[FirstBar];
-                 clast	  = clo[FirstBar];////////////////////////////////////////////////////////////////////////////////xxxxxxx
+                 clast	  = clo[FirstBar];////////////////////////////////////////////////////////////////
                   for ( z = FirstBar; z < LastBar ; z++ ) 
                  {
                           BarH = hi[z];
