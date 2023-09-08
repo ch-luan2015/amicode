@@ -7,6 +7,7 @@ hhvv = HighestVisibleValue( V );
 minv = -hhvv / 50;
 upday = C > Ref( C, -1 );
 
+
 ///////////////////////////////////////////////////
 //Draw line entry-stoploss-target on chart
 asset_count = StrCount( Myasset, "|" ) + 1;
@@ -224,7 +225,7 @@ function GfxHTabs( id, headers, headheight, x, y, width, height, colorfg, colorb
 ///////////////////////////////////////////////////
 GfxSelectFont( "Arial", CellHeight / 2 );
 GfxSelectSolidBrush( colorSkyblue );
-GfxRoundRect( x1, y1 - 4, x1 + CellWidth * col*1.1 + 35, y1 + CellHeight * 1.5, 15, 15 );
+GfxRoundRect( x1, y1 - 4, x1 + CellWidth * col * 1.1 + 35, y1 + CellHeight * 1.5, 15, 15 );
 GfxSetTextColor( colorYellow );
 GfxSetBkMode( 1 ); //set transparent mode
 dt = SelectedValue( DateTime() );
@@ -237,14 +238,14 @@ index_chg = index_fc - Ref( index_fc, -1 );
 colorindex = IIf( index_fc > Ref( index_fc, -1 ), colorbrightGreen, IIf( index_fc == Ref( index_fc, -1 ), colorGold, colorRed ) );
 GfxSetTextColor( colorindex[BarCount - 1] );
 GfxSelectFont( "Arial", CellHeight / 2, 800 );
-GfxDrawText( "VNINDEX " + index_fc + " " + index_rfc + "%", x1 + BtnOffsetXY, y1+5, x1 + CellWidth * 5 + 10, y1 + CellHeight * 2, 1 );
+GfxDrawText( "VNINDEX " + index_fc + " " + index_rfc + "%", x1 + BtnOffsetXY, y1 + 5, x1 + CellWidth * 5 + 10, y1 + CellHeight * 2, 1 );
 
 //Tao ON|OFF button
 id = GuiGetEvent( 0, 0 );
 event = GuiGetEvent( 0, 1 );
 MyChartID = GetChartID();
 ToggleButton = Nz( StaticVarGet( "ToggleButton" + MyChartID ) );
-GuiButtonTrigger( "On", x1 + CellWidth * col + 30, y1 + CellHeight / 4-5, 35, 25 );
+GuiButtonTrigger( "On", x1 + CellWidth * col + 30, y1 + CellHeight / 4 - 5, 35, 25 );
 GuiSetColors( IDset, IDset, 2, colorWhite, colorGreen, colorYellow, colorWhite, colorGreen, colorYellow, colorGold, colorDarkTeal, colorYellow );
 
 
@@ -280,7 +281,7 @@ function DMDT( TickerList, text, _x0, _y0, CellWidth, CellHeight )
         rfc1 = LastValue( rfc );
         PnL = ( fC1 - StrToNum( giamua ) ) / StrToNum( giamua ) * 100;
         //Tinh shares
-        shares = floor(( 200000 * 0.02 ) / (StrToNum( GiaMua ) - StrToNum( Stoploss )));
+        shares = floor( ( 200000 * 0.02 ) / ( StrToNum( GiaMua ) - StrToNum( Stoploss ) ) );
 
 
 
@@ -297,7 +298,7 @@ function DMDT( TickerList, text, _x0, _y0, CellWidth, CellHeight )
                     color = colorGreen;
                 else
                     if( fC1 > StrToNum( Target ) )
-                        color=colorLime;
+                        color = colorLime;
 
         textname = symbol;
         textgia = WriteIf( fC1 < 10, "0" + WriteVal( fC1, 1.2 ), WriteVal( fC1, 1.2 ) );
@@ -332,7 +333,7 @@ function DMDT( TickerList, text, _x0, _y0, CellWidth, CellHeight )
         GfxDrawText( target, _x0 + cellWidth * col / 3 * 2  , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 6 * 5, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
 
         GfxDrawText( StrFormat( "%s  %.1f%%", "  ", Pnl ), _x0 + cellWidth * col / 6 * 5 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
-        GfxDrawText( WriteVal(shares,1.0), _x0 + cellWidth * col / 2.5 * 5 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 5, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( WriteVal( shares, 1.0 ), _x0 + cellWidth * col / 2.5 * 5 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 5, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
 
 
     }
@@ -343,7 +344,7 @@ function DMTD( TickerList, text, _x0, _y0, CellWidth, CellHeight )
 {
     GfxSelectSolidBrush( colorDarkGreen );
     sym_num = StrCount( tickerlist, "|" ) + 1;
-    GfxRoundRect( _x0, _y0 + 10, _x0 + CellWidth * col*1.1 + 35, _y0 + CellHeight * ( sym_num + 2 ) + 10, 15, 15 );
+    GfxRoundRect( _x0, _y0 + 10, _x0 + CellWidth * col * 1.1 + 35, _y0 + CellHeight * ( sym_num + 2 ) + 10, 15, 15 );
     GfxLabel( text, _x0, _y0 + 10, CellWidth * col, CellHeight, 1 );
 
     for( i = 0; i < wl_count; i++ )
@@ -410,11 +411,11 @@ function DMTD( TickerList, text, _x0, _y0, CellWidth, CellHeight )
 procedure GfxHT( x, y )
 {
     SetOrigin( x1, y1 + CellHeight * 3 );
-    G = GfxHTabs( "HTab1", "DANH MUC", 30, _x0, _y0 - CellHeight-10, CellWidth * col*1.1+30, CellHeight, colorWhite, colorViolet );
+    G = GfxHTabs( "HTab1", "DANH MUC", 30, _x0, _y0 - CellHeight - 10, CellWidth * col * 1.1 + 30, CellHeight, colorWhite, colorViolet );
 
 
-    DMDT( Myasset, " DANH MUC DAU TU", _x0, _y0-9, CellWidth, CellHeight );
-    DMTD( MyWL, "DANH MUC THEO DOI", _x0, _y0 + CellHeight * asset_count + 2 * CellHeight-9, CellWidth, CellHeight );
+    DMDT( Myasset, " DANH MUC DAU TU", _x0, _y0 - 9, CellWidth, CellHeight );
+    DMTD( MyWL, "DANH MUC THEO DOI", _x0, _y0 + CellHeight * asset_count + 2 * CellHeight - 9, CellWidth, CellHeight );
 }
 
 //Event Control button quen click
@@ -437,7 +438,169 @@ else
     GuiSetColors( IDset, IDset, 1, colorWhite, colorRed, colorYellow, colorWhite, colorGreen, colorYellow, colorGold, colorDarkTeal, colorYellow );
 }
 
+///////////////////////////////////////////////////
+// Tao diem gia High and Low tren do thi
+_SECTION_BEGIN("Pivot high low");
+//Diem Pivot , de lam gi ?
+procedure alternate_proc(pk,tr,sumpk,sumtr){
 
+	global pkg;
+	global trg;
+	
+	pkg = pk;
+	trg = tr;
+	idxpk = 0;
+    idxtr = 0;
+    flgtr = 0;
+    flgpk = 0;
+    
+    for( i = 1; i < BarCount; i++ )
+    {
+        if( pk[i] AND sumpk[i] == 1 AND !tr[i] AND flgpk == 0 )
+        {
+            idxpk = i;
+            flgtr = 0;
+        }
+        else
+            if( ( pk[i] AND sumpk[i] > 1 AND !tr[i] ) OR( pk[i] AND flgpk == 1 ) )
+            {
+                if( H[i] > H[idxpk] )
+                {
+                    pkg[idxpk] = 0;
+                    idxpk = i;
+                    flgpk = 0;
+                }
+                else
+                    if( H[i] <= H[idxpk] )
+                    {
+                        pkg[i] = 0;
+                        flgpk = 0;
+                    }
+            }
+            else
+                if( tr[i] AND sumtr[i] == 1 AND !pk[i] AND flgtr == 0 )
+                {
+                    idxtr = i;
+                    flgpk = 0;
+                }
+                else
+                    if( ( tr[i] AND sumtr[i] > 1 AND !pk[i] ) OR( tr[i] AND flgtr == 1 ) )
+                    {
+                        if( L[i] < L[idxtr] )
+                        {
+                            trg[idxtr] = 0;
+                            idxtr = i;
+                            flgtr = 0;
+                        }
+                        else
+                            if( L[i] >= L[idxtr] )
+                            {
+                                trg[i] = 0;
+                                flgtr = 0;
+                            }
+                    }
+                    else
+                        if( pk[i] AND tr[i] )
+                        {
+                            if( sumpk[i - 1] > sumtr[i - 1] )
+                            {
+                                pkg[i] = 0;
+                                flgtr = 1;
+                                idxtr = i;
+                            }
+                            else
+                                if( sumtr[i - 1] > sumpk[i - 1] )
+                                {
+                                    trg[i] = 0;
+                                    flgpk = 1;
+                                    idxpk = i;
+                                }
+                        }
+    }
+
+}
+
+
+
+// Fractal Pivots
+x = bi = BarIndex();
+fvb = FirstVisibleValue( bi );
+lvb = LastVisibleValue( bi );
+
+rightstrength = Param( "Right Strength",2, 2, 50, 1 );
+leftstrength = Param( "Left Strength", 2, 2, 50, 1 );
+leftstrength = rightstrength;
+
+pk = H == HHV( H, leftstrength ) AND Ref( HHV( H, rightstrength ), rightstrength ) < H;
+tr = L == LLV( L, leftstrength ) AND Ref( LLV( L, rightstrength ), rightstrength ) > L;
+
+sumpk = Sum( pk, BarsSince( tr ) );
+sumtr = Sum( tr, BarsSince( pk ) );
+alternate_proc( pk, tr, sumpk, sumtr );
+pk = pkg;
+tr = trg;
+
+for( i = 0; i < 3; i++ )
+{
+    VarSet( "px" + i, ValueWhen( pk, bi, i ) );
+    VarSet( "tx" + i, ValueWhen( tr, bi, i ) );
+    VarSet( "ph" + i, ValueWhen( pk, H, i ) );
+    VarSet( "tl" + i, ValueWhen( tr, L, i ) );
+}
+
+ll = tr AND tl1 < tl2;
+hl = tr AND tl1 > tl2;
+hh = pk AND ph1 > ph2;
+lh = pk AND ph1 < ph2;
+dt = pk AND ph1 == ph2;
+db = tr AND tl1 == tl2;
+
+
+clrpk = colorblack;
+clrtr = colorblack;
+
+for( i = lvb; i > fvb; i-- )
+{
+    // troughs
+    if( ll[i] )
+    {
+        str = "" + WriteVal(L[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, L[i], clrtr, colorDefault, -30 );
+    }
+
+    if( hl[i] )
+    {
+        str = "" + WriteVal(L[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, L[i], clrtr, colorDefault, -30 );
+    }
+
+    if( db[i] )
+    {
+        str = "DB";
+        PlotTextSetFont( str, "Arial", 8, i, L[i], clrtr, colorDefault, -30 );
+    }
+
+    //peaks
+    if( hh[i] )
+    {
+        str = ""+WriteVal(H[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, H[i], clrpk, colorDefault, 20 );
+    }
+
+    if( lh[i] )
+    {
+        str = "" +WriteVal(H[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, H[i], clrpk, colorDefault, 20 );
+    }
+
+    if( dt[i] )
+    {
+        str = "DT";
+        PlotTextSetFont( str, "Arial", 8, i, H[i], clrpk, colorDefault, 20 );
+    }
+}
+
+GraphXSpace = 8;
 
 
 
@@ -447,7 +610,7 @@ _SECTION_BEGIN( "Price Chart" );
 GraphLabelDecimals = 2;
 SetChartOptions( 0, chartShowArrows | chartShowDates );
 
-_N(Title = " "+EncodeColor(colorViolet)+ Name() + " - "+EncodeColor(colorBlue)+FullName()+ " - "+ EncodeColor(colorBlack)+IndustryID(1) + EncodeColor(colorGreen)+ "  | C:  "+WriteVal(C,1.2)+"  "+ " ("+ WriteVal( ROC( C, 1),1.1)+"%) "+ EncodeColor(colorGrey40)+ " | V:  " + EncodeColor(colorDarkGreen)+WriteVal(V,1.0));
+_N( Title = " " + EncodeColor( colorViolet ) + Name() + " - " + EncodeColor( colorBlue ) + FullName() + " - " + EncodeColor( colorBlack ) + IndustryID( 1 ) + EncodeColor( colorGreen ) + "  | C:  " + WriteVal( C, 1.2 ) + "  " + " (" + WriteVal( ROC( C, 1 ), 1.1 ) + "%) " + EncodeColor( colorGrey40 ) + " | V:  " + EncodeColor( colorDarkGreen ) + WriteVal( V, 1.0 ) );
 
 //Type Chart
 TypeofPrice = ParamList( "Type of Price", "Candle Stick,Bar Chart", 0 );
@@ -527,358 +690,386 @@ _SECTION_END();
 
 //
 //Chart in Chart
-_SECTION_BEGIN("Chart in chart");
+_SECTION_BEGIN( "Chart in chart" );
 pxwidth = Status( "pxwidth" );
 pxheight = Status( "pxheight" );
 pxb = Status( "pxchartbottom" );
-maunenboad=ParamColor("colorkhung", colorLightYellow);
+maunenboad = ParamColor( "colorkhung", colorLightYellow );
 GfxSelectSolidBrush( maunenboad );
 
-function GetMonth( MonthNumber ) 
-{ 
-         switch (MonthNumber) { 
-            case 2 :  
-              result = "Feb"; 
-               break ; 
-            case 3 : 
-              result = "Mar"; 
-              break ; 
-            case 4 : 
-              result = "Apr"; 
-            break ; 
-          case 5 : 
-            result = "May"; 
-            break ; 
-          case 6 : 
-            result = "Jun"; 
-            break ; 
-          case 7 : 
-            result = "Jul"; 
-            break ; 
-          case 8 : 
-            result = "Aug"; 
-            break ; 
-          case 9 : 
-            result = "Sep"; 
-            break ; 
-          case 10 : 
-            result = "Oct"; 
-            break ; 
-          case 11 : 
-            result = "Nov"; 
-            break ; 
-          case 12 : 
-            result = "Dec"; 
-      break ; 
-   } 
+function GetMonth( MonthNumber )
+{
+    switch( MonthNumber )
+    {
+        case 2 :
+            result = "Feb";
+            break ;
 
-   return result; 
-} 
+        case 3 :
+            result = "Mar";
+            break ;
+
+        case 4 :
+            result = "Apr";
+            break ;
+
+        case 5 :
+            result = "May";
+            break ;
+
+        case 6 :
+            result = "Jun";
+            break ;
+
+        case 7 :
+            result = "Jul";
+            break ;
+
+        case 8 :
+            result = "Aug";
+            break ;
+
+        case 9 :
+            result = "Sep";
+            break ;
+
+        case 10 :
+            result = "Oct";
+            break ;
+
+        case 11 :
+            result = "Nov";
+            break ;
+
+        case 12 :
+            result = "Dec";
+            break ;
+    }
+
+    return result;
+}
 
 
-GfxSetBkMode(0); // transparent
-lDays =Param ( "MA200", 200 , 50 , 250 , 1 ) ;
-sDays =Param ( "MA50", 50 , 5 , 100 , 1 ) ;
-tDays= Param ( "MA21", 21 , 5 , 100 , 1 ) ;
-vDays =Param ( "Volume MA", 20 , 5 , 100 , 1 ) ;
+GfxSetBkMode( 0 ); // transparent
+lDays = Param( "MA200", 200 , 50 , 250 , 1 ) ;
+sDays = Param( "MA50", 50 , 5 , 100 , 1 ) ;
+tDays = Param( "MA21", 21 , 5 , 100 , 1 ) ;
+vDays = Param( "Volume MA", 20 , 5 , 100 , 1 ) ;
 ChartMargin = 20 ;
 DateMargin = 10 ;
 DataMargin = 20 ;
-ScreenHeight = Status ( "pxheight" );
-SceernWidth = Status ( "pxwidth" );
-Bars =Param ( "Number Of Bars", 49 , 20 , 200 , 1 ) ;
+ScreenHeight = Status( "pxheight" );
+SceernWidth = Status( "pxwidth" );
+Bars = Param( "Number Of Bars", 49 , 20 , 200 , 1 ) ;
 LastBar =  BarCount ;
 FirstBar =  LastBar - Bars;
 SymbolNum = 1;
 
 
-cellheight = 29/870*pxheight;
+cellheight = 29 / 870 * pxheight;
 
 GfxSelectSolidBrush( maunenboad );
-letrai1=Param ( "Le trai", 600 , 0 , 2000 , 1 ) ;
-lephai1=Param ( "Le phai", 800 , 0 , 2000 , 1 ) ;
-letren1=Param ( "Le tren", 25 , 0 , 2000 , 1 ) ;
-leduoi1=Param ( "Le duoi", 600 , 0 , 2000 , 1 ) ;
-Letrai=letrai1/1880*pxwidth;
-letren=letren1/870*pxheight;
-lephai=lephai1/1880*pxwidth;
-leduoi=leduoi1/870*pxheight;
-letrenw=letren+430/870*pxheight;
-leduoiw=leduoi-410/870*pxheight;
-ChartHeight = (ScreenHeight-letren)-leduoi   ;
-Width = (SceernWidth-letrai)-lephai ;
-BarChartHeight=  (0.75 ) * ChartHeight - DataMargin;
-VolChartHeight = ChartHeight - BarChartHeight - DataMargin*2 ;
-NumberPriceLevels = BarChartHeight /20 ;
-BarChartWidth=  Width - 45 ;
-BarWidth = (BarChartWidth - ChartMargin*1.5 ) / Bars  ;
+letrai1 = Param( "Le trai", 600 , 0 , 2000 , 1 ) ;
+lephai1 = Param( "Le phai", 800 , 0 , 2000 , 1 ) ;
+letren1 = Param( "Le tren", 25 , 0 , 2000 , 1 ) ;
+leduoi1 = Param( "Le duoi", 600 , 0 , 2000 , 1 ) ;
+Letrai = letrai1 / 1880 * pxwidth;
+letren = letren1 / 870 * pxheight;
+lephai = lephai1 / 1880 * pxwidth;
+leduoi = leduoi1 / 870 * pxheight;
+letrenw = letren + 430 / 870 * pxheight;
+leduoiw = leduoi - 410 / 870 * pxheight;
+ChartHeight = ( ScreenHeight - letren ) - leduoi   ;
+Width = ( SceernWidth - letrai ) - lephai ;
+BarChartHeight = ( 0.75 ) * ChartHeight - DataMargin;
+VolChartHeight = ChartHeight - BarChartHeight - DataMargin * 2 ;
+NumberPriceLevels = BarChartHeight / 20 ;
+BarChartWidth =  Width - 45 ;
+BarWidth = ( BarChartWidth - ChartMargin * 1.5 ) / Bars  ;
 
-for ( x = 0 ; x < 1 ; x++ ) 
-{ 
-         for ( i = 0 ; i < 1 ; i++ ) 
-        { 
-                 notDone = True;
-                 sym = Name();
-                  if (sym != "" )
-                 {
-                 x1 = Width * i +5+letrai ; 
-                 y1 = ChartHeight * x + 5+letren ;
-                 x2 = Width * (i + 1 )+letrai;
-                 y2 = ChartHeight * (x + 1 )-DateMargin+letren;
-                  GfxSelectPen ( colorBlack ); 
-                  GfxRectangle ( x1, y1, x2, y2 );
-                 SymbolNum++;
-                  SetForeign (sym);
-/////////////////////
-Timeframe  = ParamList("Time frame","Hourly,Weekly,Monthly",3);
-
-switch(Timeframe)
+for( x = 0 ; x < 1 ; x++ )
 {
+    for( i = 0 ; i < 1 ; i++ )
+    {
+        notDone = True;
+        sym = Name();
 
-	case "Hourly":
-	TimeFrameSet(inHourly);
-	break;
-	case "Weekly":
-	TimeFrameSet(inWeekly);
-	break;
-	case "Monthly":
-	TimeFrameSet(inMonthly);
-	break;
-}	
-op =O; 
-hi =H;
-lo = L; 
-clo = C; 
-vold = V;
+        if( sym != "" )
+        {
+            x1 = Width * i + 5 + letrai ;
+            y1 = ChartHeight * x + 5 + letren ;
+            x2 = Width * ( i + 1 ) + letrai;
+            y2 = ChartHeight * ( x + 1 ) - DateMargin + letren;
+            GfxSelectPen( colorBlack );
+            GfxRectangle( x1, y1, x2, y2 );
+            SymbolNum++;
+            SetForeign( sym );
+/////////////////////
+            Timeframe  = ParamList( "Time frame", "Weekly,Monthly", 1 );
+
+            switch( Timeframe )
+            {
+
+                case "Weekly":
+                    TimeFrameSet( inWeekly );
+                    break;
+
+                case "Monthly":
+                    TimeFrameSet( inMonthly );
+                    break;
+            }
+
+            op = O;
+            hi = H;
+            lo = L;
+            clo = C;
+            vold = V;
 
 //////////////////////////////////
-                 EMAShort= EMA (clo,sDays);
-                 EMAT= EMA (clo,tDays);
-                 EMALong= EMA (clo,lDays);
-                 EMAVol= MA (vold,vDays);
-				vol20=Foreign(sym,"Volume");				
-				mavol20=LastValue( MA(vold,20));
-                 D = Day ();
-                 M = Month ();
-                 Y = Year ();
-				 priceHigh = 0 ;
-                 VolHigh = 0 ;
-                 priceMin = 1000000 ;
-                  for ( z = FirstBar; z < LastBar ; z++ ) 
-                 { 
-                          Vol = vold[z];
-                          BarH = hi[z];
-                          BarL = lo[z];                         
-                           if ( Vol > VolHigh ) 
-                          { 
-                                   VolHigh = Vol;
-                          }
-                           if ( BarH > priceHigh ) 
-                          { 
-                                   priceHigh = BarH;
-                          }
-                           if ( BarL < priceMin ) 
-                          { 
-                                   priceMin = BarL;
-                          }
-                 }
-                 LOpen = op[LastBar- 1];
-                 LHigh = hi[LastBar- 1];
-                 LLow = lo[LastBar- 1];
-                 LClose = clo[LastBar- 1];
-                 LClose2 = clo[LastBar- 2];
-                 LVol = vold[LastBar- 1];
-                 chg=(LClose-LClose2)*100/LClose2;
-				GfxSelectFont ( "Arial" , 11,600 ); 
-				GfxTextOut (Timeframe, x1+50/1880*pxwidth , y1+30); 
-                GfxSelectFont ( "Arial" , 8 ); 
-                GfxSetTextColor (colorBlack); 
-                GfxTextOut ("O: " +LOpen + "   H: " +LHigh + "   L: " +LLow + "   C: " +LClose + "   Vol: " +LVol/ 1000000 + " M", x1+30/1880*pxwidth , y1+2 ); 			
-                 VolRatio = VolChartHeight /  VolHigh ;
-                 Range = priceHigh - priceMin;
-                 Ratio = BarChartHeight / Range ;
-                 PriceLineLevel = Range / NumberPriceLevels;
-                 yHi=(((priceHigh - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                  GfxTextOut ( WriteVal (priceHigh,1.2 ),   x1 + BarChartWidth, yHi -8 );
-                  GfxSelectPen ( colorLightGrey ); 
-                  GfxMoveTo ( x1 , yHi ); 
-                  GfxLineTo ( x1 + BarChartWidth -5 , yHi );
-                  for ( z = 0 ; z < NumberPriceLevels- 1   ; z++ ) 
-                 { 
-                          PriceLevel = PriceLineLevel*z + priceMin;
+            EMAShort = EMA( clo, sDays );
+            EMAT = EMA( clo, tDays );
+            EMALong = EMA( clo, lDays );
+            EMAVol = MA( vold, vDays );
+            vol20 = Foreign( sym, "Volume" );
+            mavol20 = LastValue( MA( vold, 20 ) );
+            D = Day();
+            M = Month();
+            Y = Year();
+            priceHigh = 0 ;
+            VolHigh = 0 ;
+            priceMin = 1000000 ;
 
-                          yHi=(((PriceLevel - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                           GfxTextOut ( WriteVal (PriceLevel, 1.2 ),   x1 + BarChartWidth, yHi -8 );
-                           GfxSelectPen ( colorLightGrey ); 
-                           GfxMoveTo ( x1 , yHi );
-                           GfxLineTo ( x1 + BarChartWidth -5 , yHi );
-                 }
+            for( z = FirstBar; z < LastBar ; z++ )
+            {
+                Vol = vold[z];
+                BarH = hi[z];
+                BarL = lo[z];
 
-                 HighestLast = 0 ;
-                 w = 0 ;
-                 sEMAlast = EMAShort[FirstBar];
-                 tEMAlast = EMAT[FirstBar];
-                 lEMAlast = EMALong[FirstBar];
-                 vEMAlast = EMAVol[FirstBar];
-                 clast	  = clo[FirstBar];////////////////////////////////////////////////////////////////
-                  for ( z = FirstBar; z < LastBar ; z++ ) 
-                 {
-                          BarH = hi[z];
-                          BarL = lo[z];
-                          BarO = op[z];
-                          BarC = clo[z];
-                          Vol = vold[z];
-                          sEMA = EMAShort[z];
-                          ttEMA = EMAT[z];
-                          lEMA = EMALong[z];
-                          vEMA = EMAVol[z];
-                          BarDay = D[z];
-                          BarMonth = M[z];
-                          BarYear = Y[z];
-                          yO = (((BarO - priceMin )* Ratio)- BarChartHeight ) * -1 + y1 + DataMargin;
-                          yC = (((BarC - priceMin )* Ratio)- BarChartHeight ) * -1 + y1 + DataMargin;
-                          yHi = (((BarH - priceMin )* Ratio)- BarChartHeight ) * -1 + y1 + DataMargin;
-                          yLo = (((BarL - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin ;
-                          ysEMAlast = (((sEMAlast - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                          ysEMA = (((sEMA - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                           ytEMAlast = (((tEMAlast - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                          ytEMA = (((ttEMA - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;                       
-                          ylEMAlast = (((lEMAlast - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                          ylEMA = (((lEMA - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                          vHi = y2 - (Vol * VolRatio)  ;
-                          yvEMAlast = y2 - (vEMAlast  * VolRatio) ;
-                          yvEMA = y2 - (vEMA * VolRatio)  ;
-                          ///////////
-                          yClast = (((clast - priceMin )* Ratio) - BarChartHeight) * -1 + y1 + DataMargin;
-                          ////////////////
-                           
-                          
-                           if ( BarO > BarC)
-                          {
-                                    GfxSelectSolidBrush ( colorRed ); 
-                                    GfxSelectPen ( colorRed ,2);
-                          }
-                           else
-                          { 
-                                    GfxSelectSolidBrush ( colorGreen );
-                                    GfxSelectPen ( colorGreen ,2);
-                          }                         
-                                          
-						// Plot bar in minichart
-								
-							//Bar dang candle
-                           //GfxMoveTo ( BarWidth * w + x1 + ChartMargin , yHi );
-                           //GfxLineTo ( BarWidth * w + x1 + ChartMargin, yLo );
-                           //GfxMoveTo ( BarWidth * w + x1 + ChartMargin -4   , yo );
-                           //GfxLineTo ( BarWidth * w + x1 + ChartMargin +4, yo );
-                           //GfxMoveTo ( BarWidth * w + x1 + ChartMargin +4   , yC );
-                           //GfxLineTo ( BarWidth * w + x1 + ChartMargin -4, yC );
-                           ////Ve hinh chu nhat thanh nen
-                           //GfxRectangle( BarWidth * w + x1 + ChartMargin -5   , yo,BarWidth * w + x1 + ChartMargin +5 , yC);	
-                           
-                           //Bar chart
-                           GfxMoveTo ( BarWidth * w + x1 + ChartMargin , yHi );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin, yLo );
-                           //Ve thanh ngang Open
-                           //GfxMoveTo ( BarWidth * w + x1 + ChartMargin -4   , yo );
-                           //GfxLineTo ( BarWidth * w + x1 + ChartMargin +4, yo );
-                           //Ve thanh nganh Close tuan
-                           GfxMoveTo ( BarWidth * w + x1 + ChartMargin +4   , yC );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin -4, yC );
-                          // Plot Volume
-                           if ( BarO > BarC)
-                          {
-                                    GfxSelectPen ( colorRed ,2); 
-                          }
-                           else
-                          { 
-                                    GfxSelectPen ( colorGreen ,2);
-                          }
-								
-                           GfxMoveTo ( BarWidth * w + x1 + ChartMargin , vHi-20 );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin, y2-20 );
-								// Plot Volume EMAs
-                           GfxSelectPen ( colorRed ); 
-                           GfxMoveTo ( BarWidth * (w -1 ) + x1  + ChartMargin , ysEMAlast );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin, ysEMA );
-                           GfxSelectPen ( colorBlue ); 
-                           GfxMoveTo ( BarWidth * (w -1 ) + x1  + ChartMargin , ytEMAlast );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin, ytEMA );
-                           GfxSelectPen ( colorViolet ); 
-                           GfxMoveTo ( BarWidth * (w -1 ) + x1  + ChartMargin , ylEMAlast );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin, ylEMA );
-                           GfxSelectPen ( colorBlack ); 
-                           GfxMoveTo ( BarWidth * (w -1 ) + x1  + ChartMargin , yvEMAlast-20 );
-                           GfxLineTo ( BarWidth * w + x1 + ChartMargin, yvEMA-20 );                           
-                          w++;                          
-                          sEMAlast = sEMA ;
-                          tEMAlast = ttEMA ;
-                          lEMAlast = lEMA ;
-                          vEMAlast = vEMA ;
-                          clast=BarC;                            
-                                  /////////////////////
-                           GfxSetTextColor (colorBlue); 
-                           GfxSelectFont ( "Arial" , 7 ); 
-                           GfxSelectPen ( colorLightGrey ); 
-								// Draw vertical month separator and X-axis labels
-                           if (BarDay== 1 & notDone )
-                          {
-                                    if (BarMonth == 1 ) myLabel =WriteVal (BarYear, 1.0 );                                  
-                                    else myLabel =GetMonth(BarMonth);
-                                    GfxTextOut (myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 +DateMargin/3-25 );
-                                    GfxMoveTo ( BarWidth * w + x1 + ChartMargin , y2  );
-                                    GfxLineTo ( BarWidth * w + x1 + ChartMargin, y1 + DataMargin  );
-                                   notDone = False;
-                          }
+                if( Vol > VolHigh )
+                {
+                    VolHigh = Vol;
+                }
 
-                           if (BarDay== 2 & notDone )
-                          {
-                                    if (BarMonth == 1 ) myLabel =WriteVal (BarYear, 1.0 );
-                                    else myLabel =GetMonth(BarMonth);
-                                    GfxTextOut (myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 +DateMargin/3-25 );
-                                    GfxMoveTo ( BarWidth * w + x1 + ChartMargin , y2  );
-                                    GfxLineTo ( BarWidth * w + x1 + ChartMargin, y1 + DataMargin  );
-                                   notDone = False;
-                          }
+                if( BarH > priceHigh )
+                {
+                    priceHigh = BarH;
+                }
 
-                           if (BarDay== 3 & notDone )
-                          {
-                                    if (BarMonth == 1 ) myLabel =WriteVal (BarYear, 1.0 );
-                                    else myLabel =GetMonth(BarMonth);
-                                    GfxTextOut (myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 +DateMargin/3-25 );
-                                    GfxMoveTo ( BarWidth * w + x1 + ChartMargin , y2  );
-                                    GfxLineTo ( BarWidth * w + x1 + ChartMargin, y1 + DataMargin  );
-                                   notDone = False;
-                          }
+                if( BarL < priceMin )
+                {
+                    priceMin = BarL;
+                }
+            }
 
-                           if (BarDay== 4 & notDone )
-                          {
-                                    if (BarMonth == 1 ) myLabel =WriteVal (BarYear, 1.0 );
-                                    else myLabel =GetMonth(BarMonth);
-                                    GfxTextOut (myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 +DateMargin/3-25 );
-                                    GfxMoveTo ( BarWidth * w + x1 + ChartMargin , y2  );
-                                    GfxLineTo ( BarWidth * w + x1 + ChartMargin, y1 + DataMargin  );
-                                   notDone = True;
-                          }
+            LOpen = op[LastBar - 1];
+            LHigh = hi[LastBar - 1];
+            LLow = lo[LastBar - 1];
+            LClose = clo[LastBar - 1];
+            LClose2 = clo[LastBar - 2];
+            LVol = vold[LastBar - 1];
+            chg = ( LClose - LClose2 ) * 100 / LClose2;
+            GfxSelectFont( "Arial" , 11, 600 );
+            GfxTextOut( Timeframe, x1 + 50 / 1880 * pxwidth , y1 + 30 );
+            GfxSelectFont( "Arial" , 8 );
+            GfxSetTextColor( colorBlack );
+            GfxTextOut( "O: " + LOpen + "   H: " + LHigh + "   L: " + LLow + "   C: " + LClose + "   Vol: " + LVol / 1000000 + " M", x1 + 30 / 1880 * pxwidth , y1 + 2 );
+            VolRatio = VolChartHeight /  VolHigh ;
+            Range = priceHigh - priceMin;
+            Ratio = BarChartHeight / Range ;
+            PriceLineLevel = Range / NumberPriceLevels;
+            yHi = ( ( ( priceHigh - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+            GfxTextOut( WriteVal( priceHigh, 1.2 ),   x1 + BarChartWidth, yHi - 8 );
+            GfxSelectPen( colorLightGrey );
+            GfxMoveTo( x1 , yHi );
+            GfxLineTo( x1 + BarChartWidth - 5 , yHi );
 
-                           if (BarDay== 5 & notDone )
-                          {
-                                    if (BarMonth == 1 ) myLabel =WriteVal (BarYear, 1.0 );
-                                    else myLabel =GetMonth(BarMonth);
-                                    GfxTextOut (myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 +DateMargin/3-25 );
-                                    GfxMoveTo ( BarWidth * w + x1 + ChartMargin , y2 - VolChartHeight );
-                                    GfxLineTo ( BarWidth * w + x1 + ChartMargin, y1 + DataMargin );
-                                   notDone = True;
-                          }
-                           if (BarDay== 6 |BarDay== 7 |BarDay== 8 |BarDay== 9 |BarDay== 10 )
-                          {
-                                   notDone = True;
-                          }                                                     
-                 }
-                  RestorePriceArrays (); 
-                 }
-                 TimeFrameRestore();
-        } 
+            for( z = 0 ; z < NumberPriceLevels - 1   ; z++ )
+            {
+                PriceLevel = PriceLineLevel * z + priceMin;
+
+                yHi = ( ( ( PriceLevel - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                GfxTextOut( WriteVal( PriceLevel, 1.2 ),   x1 + BarChartWidth, yHi - 8 );
+                GfxSelectPen( colorLightGrey );
+                GfxMoveTo( x1 , yHi );
+                GfxLineTo( x1 + BarChartWidth - 5 , yHi );
+            }
+
+            HighestLast = 0 ;
+            w = 0 ;
+            sEMAlast = EMAShort[FirstBar];
+            tEMAlast = EMAT[FirstBar];
+            lEMAlast = EMALong[FirstBar];
+            vEMAlast = EMAVol[FirstBar];
+            clast	  = clo[FirstBar];////////////////////////////////////////////////////////////////
+
+            for( z = FirstBar; z < LastBar ; z++ )
+            {
+                BarH = hi[z];
+                BarL = lo[z];
+                BarO = op[z];
+                BarC = clo[z];
+                Vol = vold[z];
+                sEMA = EMAShort[z];
+                ttEMA = EMAT[z];
+                lEMA = EMALong[z];
+                vEMA = EMAVol[z];
+                BarDay = D[z];
+                BarMonth = M[z];
+                BarYear = Y[z];
+                yO = ( ( ( BarO - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                yC = ( ( ( BarC - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                yHi = ( ( ( BarH - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                yLo = ( ( ( BarL - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin ;
+                ysEMAlast = ( ( ( sEMAlast - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                ysEMA = ( ( ( sEMA - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                ytEMAlast = ( ( ( tEMAlast - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                ytEMA = ( ( ( ttEMA - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                ylEMAlast = ( ( ( lEMAlast - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                ylEMA = ( ( ( lEMA - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                vHi = y2 - ( Vol * VolRatio )  ;
+                yvEMAlast = y2 - ( vEMAlast  * VolRatio ) ;
+                yvEMA = y2 - ( vEMA * VolRatio )  ;
+                ///////////
+                yClast = ( ( ( clast - priceMin ) * Ratio ) - BarChartHeight ) * -1 + y1 + DataMargin;
+                ////////////////
+
+
+                if( BarO > BarC )
+                {
+                    GfxSelectSolidBrush( colorRed );
+                    GfxSelectPen( colorRed , 2 );
+                }
+                else
+                {
+                    GfxSelectSolidBrush( colorGreen );
+                    GfxSelectPen( colorGreen , 2 );
+                }
+
+                // Plot bar in minichart
+
+                //Bar dang candle
+                //GfxMoveTo ( BarWidth * w + x1 + ChartMargin , yHi );
+                //GfxLineTo ( BarWidth * w + x1 + ChartMargin, yLo );
+                //GfxMoveTo ( BarWidth * w + x1 + ChartMargin -4   , yo );
+                //GfxLineTo ( BarWidth * w + x1 + ChartMargin +4, yo );
+                //GfxMoveTo ( BarWidth * w + x1 + ChartMargin +4   , yC );
+                //GfxLineTo ( BarWidth * w + x1 + ChartMargin -4, yC );
+                ////Ve hinh chu nhat thanh nen
+                //GfxRectangle( BarWidth * w + x1 + ChartMargin -5   , yo,BarWidth * w + x1 + ChartMargin +5 , yC);
+
+                //Bar chart
+                GfxMoveTo( BarWidth * w + x1 + ChartMargin , yHi );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin, yLo );
+                //Ve thanh ngang Open
+                //GfxMoveTo ( BarWidth * w + x1 + ChartMargin -4   , yo );
+                //GfxLineTo ( BarWidth * w + x1 + ChartMargin +4, yo );
+                //Ve thanh nganh Close tuan
+                GfxMoveTo( BarWidth * w + x1 + ChartMargin + 4   , yC );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin - 4, yC );
+
+                // Plot Volume
+                if( BarO > BarC )
+                {
+                    GfxSelectPen( colorRed , 2 );
+                }
+                else
+                {
+                    GfxSelectPen( colorGreen , 2 );
+                }
+
+                GfxMoveTo( BarWidth * w + x1 + ChartMargin , vHi - 20 );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin, y2 - 20 );
+                // Plot Volume EMAs
+                GfxSelectPen( colorRed );
+                GfxMoveTo( BarWidth * ( w - 1 ) + x1  + ChartMargin , ysEMAlast );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin, ysEMA );
+                GfxSelectPen( colorBlue );
+                GfxMoveTo( BarWidth * ( w - 1 ) + x1  + ChartMargin , ytEMAlast );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin, ytEMA );
+                GfxSelectPen( colorViolet );
+                GfxMoveTo( BarWidth * ( w - 1 ) + x1  + ChartMargin , ylEMAlast );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin, ylEMA );
+                GfxSelectPen( colorBlack );
+                GfxMoveTo( BarWidth * ( w - 1 ) + x1  + ChartMargin , yvEMAlast - 20 );
+                GfxLineTo( BarWidth * w + x1 + ChartMargin, yvEMA - 20 );
+                w++;
+                sEMAlast = sEMA ;
+                tEMAlast = ttEMA ;
+                lEMAlast = lEMA ;
+                vEMAlast = vEMA ;
+                clast = BarC;
+                /////////////////////
+                GfxSetTextColor( colorBlue );
+                GfxSelectFont( "Arial" , 7 );
+                GfxSelectPen( colorLightGrey );
+
+                // Draw vertical month separator and X-axis labels
+                if( BarDay == 1 & notDone )
+                {
+                    if( BarMonth == 1 ) myLabel = WriteVal( BarYear, 1.0 );
+                    else myLabel = GetMonth( BarMonth );
+
+                    GfxTextOut( myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 + DateMargin / 3 - 25 );
+                    GfxMoveTo( BarWidth * w + x1 + ChartMargin , y2 );
+                    GfxLineTo( BarWidth * w + x1 + ChartMargin, y1 + DataMargin );
+                    notDone = False;
+                }
+
+                if( BarDay == 2 & notDone )
+                {
+                    if( BarMonth == 1 ) myLabel = WriteVal( BarYear, 1.0 );
+                    else myLabel = GetMonth( BarMonth );
+
+                    GfxTextOut( myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 + DateMargin / 3 - 25 );
+                    GfxMoveTo( BarWidth * w + x1 + ChartMargin , y2 );
+                    GfxLineTo( BarWidth * w + x1 + ChartMargin, y1 + DataMargin );
+                    notDone = False;
+                }
+
+                if( BarDay == 3 & notDone )
+                {
+                    if( BarMonth == 1 ) myLabel = WriteVal( BarYear, 1.0 );
+                    else myLabel = GetMonth( BarMonth );
+
+                    GfxTextOut( myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 + DateMargin / 3 - 25 );
+                    GfxMoveTo( BarWidth * w + x1 + ChartMargin , y2 );
+                    GfxLineTo( BarWidth * w + x1 + ChartMargin, y1 + DataMargin );
+                    notDone = False;
+                }
+
+                if( BarDay == 4 & notDone )
+                {
+                    if( BarMonth == 1 ) myLabel = WriteVal( BarYear, 1.0 );
+                    else myLabel = GetMonth( BarMonth );
+
+                    GfxTextOut( myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 + DateMargin / 3 - 25 );
+                    GfxMoveTo( BarWidth * w + x1 + ChartMargin , y2 );
+                    GfxLineTo( BarWidth * w + x1 + ChartMargin, y1 + DataMargin );
+                    notDone = True;
+                }
+
+                if( BarDay == 5 & notDone )
+                {
+                    if( BarMonth == 1 ) myLabel = WriteVal( BarYear, 1.0 );
+                    else myLabel = GetMonth( BarMonth );
+
+                    GfxTextOut( myLabel,   BarWidth * w + x1 + ChartMargin - 5 , y2 + DateMargin / 3 - 25 );
+                    GfxMoveTo( BarWidth * w + x1 + ChartMargin , y2 - VolChartHeight );
+                    GfxLineTo( BarWidth * w + x1 + ChartMargin, y1 + DataMargin );
+                    notDone = True;
+                }
+
+                if( BarDay == 6 | BarDay == 7 | BarDay == 8 | BarDay == 9 | BarDay == 10 )
+                {
+                    notDone = True;
+                }
+            }
+
+            RestorePriceArrays();
+        }
+
+        TimeFrameRestore();
+    }
 }
 
 _SECTION_END();
