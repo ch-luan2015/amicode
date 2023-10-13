@@ -40,9 +40,9 @@ for( i = 0; i < asset_count ; i++ )
 
         line_entry = LineArray( BarCount - 13, StrToNum( giamua ), BarCount, StrToNum( giamua ), 1 );
 
-        Plot( line_entry, "Entry", colorBlue, styleThick + styleDashed, Null, Null, 5 );
-        Plot( line_sl, "Stoploss", colorRed, styleThick + styleDashed, Null, Null, 5 );
-        Plot( line_target, "Target", colorgreen, styleThick + styleDashed, Null, Null, 5 );
+        //Plot( line_entry, "Entry", colorBlue, styleThick + styleDashed, Null, Null, 5 );
+        //Plot( line_sl, "Stoploss", colorRed, styleThick + styleDashed, Null, Null, 5 );
+        //Plot( line_target, "Target", colorgreen, styleThick + styleDashed, Null, Null, 5 );
     }
 
 }
@@ -58,7 +58,7 @@ if( typeof( IDset ) == "undefined" ) IDset = 0;
 CellHeight = Param( "Cell Height", 22, 0, 100, 1 );
 CellWidth = Param( "Cell Width", 79, 0, 200, 1 );
 start_x = Param( "Vi tri Table X", 0, 0, 2000, 1 );
-start_y = Param( "Vi tri Table Y", 3, 0, 500, 1 );
+start_y = Param( "Vi tri Table Y",30, 0, 500, 1 );
 BtnOffsetXY = 1;
 x1 = start_x;
 y1 = start_y;
@@ -527,9 +527,9 @@ x = bi = BarIndex();
 fvb = FirstVisibleValue( bi );
 lvb = LastVisibleValue( bi );
 
-rightstrength = Param( "Right Strength",2, 2, 50, 1 );
+rightstrength = Param( "Right Strength",8,2, 50, 1 );
 leftstrength = Param( "Left Strength", 2, 2, 50, 1 );
-leftstrength = rightstrength;
+
 
 pk = H == HHV( H, leftstrength ) AND Ref( HHV( H, rightstrength ), rightstrength ) < H;
 tr = L == LLV( L, leftstrength ) AND Ref( LLV( L, rightstrength ), rightstrength ) > L;
@@ -655,36 +655,29 @@ Vdn = IIf( C < Ref( C, -1 ), V, 0 );
 Vup = IIf( C > Ref( C, -1 ), V, 0 );
 hvup10 = HHV( vup, 10 );
 hv10 = HHV( vdn, 10 );
-VAV = MA( V, Param( "TB Vol", 30, 1, 200, 1 ) );
+VAV = MA( V, Param( "TB Vol", 21, 1, 200, 1 ) );
 
-TypeofVol = ParamList( "Type of Volume", "Pivot Pocket, Standard", 0 );
-
-switch( TypeofVol )
+colorPricechg = IIf(upday,colorGreen,colorred);
+TypeofVol  = ParamList("Type of Volume","standard, pivot pocket volume",0);
+switch(TypeofVol)
 {
 
-
-
-case "Pivot Pocket":
-    color = IIf( C > Ref( C, -1 ) AND V < hv10, ParamColor( "Volume up", colorGreen ),
-                 IIf( C > Ref( C, -1 ) AND V > hv10, ParamColor( "Pivot Pocket", colorBrightGreen ),
-                      IIf( C < Ref( C, -1 ) AND V > hvup10, ParamColor( "Max Volumn down", ColorRGB( 0, 253, 251 ) ), ParamColor( "Volume down", colorred ) ) ) );
-
+	case "pivot pocket volume":
+	color=IIf( C > Ref(C,-1) AND V<hv10, ParamColor("Volume up", colorGreen ), IIf(C>Ref(C,-1) AND V>hv10,ParamColor("Pivot Pocket", colorBrightGreen)  ,IIf(C<Ref(C,-1) AND V>hvup10,ParamColor("Max Volumn down",ColorRGB(0,253,251)),ParamColor("Volume down",colorred))));
+	
+	break;
+      
+   
+    case "standard":
+    color = IIf(C>= Ref(C,-1),ParamColor("Volume up", colorGreen ),ParamColor("Volume down",colorred));
     break;
-
-case "Standard":
-    color = IIf( C >= Ref( C, -1 ), ParamColor( "Volume up", colorGreen ), ParamColor( "Volume down", colorred ) );
-
-
-    break;
-
 }
-
 //Plot Volume and Caculator Vol 30
 
 SetBarFillColor( color );
 Plot( V, _DEFAULT_NAME(), ParamColor( "color Volume", colorWhite ), styleArea | styleOwnScale | styleNoLabel, minv, hhvv * 9 );
 CHANGE = ( ( C - Ref( C, -1 ) ) / Ref( C, -1 ) ) * 100;
-Plot( VAV, "Vol TB 30 Day", colorBlue, styleLine | styleOwnScale | styleNoLabel, minv, hhvv * 7, 0, 10 );
+Plot( VAV, "Vol TB 21 Day", colorBlue, styleLine | styleOwnScale | styleNoLabel, minv, hhvv * 7, 0, 10 );
 
 _SECTION_END();
 
@@ -805,7 +798,7 @@ for( x = 0 ; x < 1 ; x++ )
             SymbolNum++;
             SetForeign( sym );
 /////////////////////
-            Timeframe  = ParamList( "Time frame", "Weekly,Monthly", 1 );
+            Timeframe  = ParamList( "Time frame", "Weekly, Monthly", 0 );
 
             switch( Timeframe )
             {
@@ -1071,5 +1064,56 @@ for( x = 0 ; x < 1 ; x++ )
         TimeFrameRestore();
     }
 }
+
+_SECTION_END();
+
+_SECTION_BEGIN("Relative Strength");
+
+//Fix percent for Up band
+//percent = Param("Percent MA",0.1,0.01,0.5,0.01);
+
+//ATR for Up Band
+//periods = Param( "Periods", 15, 1, 200, 1 );
+//ATRs = ATR(periods) - 0.5;
+
+//Relative Strength
+base = ParamStr("RS base ticker", "VNINDEX" );
+RS = RelStrength("VNINDEX");
+
+
+//Up_MA = MA_base * (1+percent);
+//Up_MA = MA_base * (1+ATRs);
+
+//Keltner Band Code
+KMid = MA (RS, 20);  //Middle Line
+ATRPeriod = 10;         //ATR Period
+KFactor = 1.0;            //Multiplier
+KValue = ATR(ATRPeriod) * KFactor; 
+KTop = KMid + KValue;   //Upper Band
+KBottom = KMid - KValue;    //Lower Band
+Plot_Kel = ParamToggle( "Wanna Keltner Channel ?","No| Yes",0);
+if (Plot_Kel >0) {Plot(KTop,"Keltner UpBand",colorGreen);}
+
+//Plot MA for RS
+PlotMA_ngan = ParamToggle( "Wanna Short term MA ?","No| Yes",1); 
+PlotMA_dai = ParamToggle( "Wanna Long term MA ?","No| Yes",1);
+MAA=Param("Short term MA for RS",13,1,200,1);
+MAA_long=Param("Long term MA for RS",49,1,200,1);
+MA_base = MA(RS,MAA);
+MA_base_long = MA(RS,MAA_long);
+if (PlotMA_ngan >0) {Plot(MA_base,"Short term MA",colorGrey40,styleNoLabel);}
+if (PlotMA_dai >0) {Plot(MA_base_long,"Long term MA",colorRed,styleNoLabel);}
+
+Plot( RS, _SECTION_NAME() + "(" + base + ")", ParamColor( "RS Color", colorBlue ), ParamStyle("RS Style",styleThick)  );
+
+//Plot( MA_base, "MA" + "(" + MA_base + ")", ParamColor( "MA Color", colorRed ));
+//Plot( Up_MA, _SECTION_NAME() + "(" + Up_MA + ")", ParamColor( "color Up Band", colorRed ), ParamStyle("Style Upband")  );
+
+//Keltner Band
+//Plot( KTop, "Keltner Band" + "(" + KTop + ")", ParamColor( "Keltner Color", colorGreen ));
+
+
+Filter = RS > MA_base_long AND V > 50000;
+
 
 _SECTION_END();
