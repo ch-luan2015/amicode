@@ -1,0 +1,735 @@
+//Khai bao
+// Khai bao list co phieu dang giu
+Myasset = ParamStr( "My Asset", "EIB,24.7,22.3,24.8|VCG,27.9,26.3,27.5|KDH,36.4,35.05" );
+MyWL = ParamStr( "My Watchlist", "STB|BCG|VCG|SSI" );
+
+hhvv = HighestVisibleValue( V );
+minv = -hhvv / 50;
+upday = C > Ref( C, -1 );
+
+
+///////////////////////////////////////////////////
+//Draw line entry-stoploss-target on chart
+asset_count = StrCount( Myasset, "|" ) + 1;
+wl_count = StrCount( Mywl, "|" ) + 1;
+
+for( i = 0; i < asset_count ; i++ )
+{
+
+    list = StrExtract( Myasset, i, '|' );
+
+    symbol = StrExtract( list, 0, ',' ) ;
+    Giamua = StrExtract( list, 1, ',' ) ;
+    Stoploss = StrExtract( list, 2, ',' ) ;
+    Target = StrExtract( list, 3, ',' ) ;
+
+    SetForeign( symbol );
+    fc = LastValue( close );
+    rfc = ROC( fc, 1 );
+    RestorePriceArrays();
+    PnL = ( fc - StrToNum( giamua ) ) / StrToNum( giamua ) * 100;
+
+    if( Name() == symbol )
+    {
+
+        line_sl = LineArray( BarCount - 13, StrToNum( Stoploss ), BarCount, StrToNum( Stoploss ), 1 );
+
+        TargetNum = IIf( StrToNum( Target ) != 0, StrToNum( Target ), fc );
+
+        line_target = LineArray( BarCount - 13, TargetNum, BarCount, TargetNum, 1 );
+
+        line_entry = LineArray( BarCount - 13, StrToNum( giamua ), BarCount, StrToNum( giamua ), 1 );
+
+        //Plot( line_entry, "Entry", colorBlue, styleThick + styleDashed, Null, Null, 5 );
+        //Plot( line_sl, "Stoploss", colorRed, styleThick + styleDashed, Null, Null, 5 );
+        //Plot( line_target, "Target", colorgreen, styleThick + styleDashed, Null, Null, 5 );
+    }
+
+}
+
+
+///////////////////////////////////////////////////
+global IDset;
+
+if( typeof( IDset ) == "undefined" ) IDset = 0;
+
+//Bo Formatted text output sample via low-level gfxfunctions
+
+CellHeight = Param( "Cell Height", 22, 0, 100, 1 );
+CellWidth = Param( "Cell Width", 79, 0, 200, 1 );
+start_x = Param( "Vi tri Table X", 0, 0, 2000, 1 );
+start_y = Param( "Vi tri Table Y",30, 0, 500, 1 );
+BtnOffsetXY = 1;
+x1 = start_x;
+y1 = start_y;
+y2 = y1 + CellHeight;
+x2 = x1 + CellWidth;
+col = Param( "col", 5, 1, 10, 1 );
+
+function PointInside( x0, y0, x, y, width, height )
+{
+    global _x0, _y0;
+    x = x + _x0;
+    y = y + _y0;
+    x0 = x0 + _x0;
+    y0 = y0 + _y0;
+    return ( ( x0 >= x ) && ( y0 >= y ) && ( x0 <= ( x + width ) ) && ( y0 <= ( y + height ) ) );
+}
+_cursorMouseButtons = GetCursorMouseButtons();
+DT_CENTER = 1;
+DT_VCENTER = 4 | 32;
+
+function LeftClickInside( x, y, width, height )
+{
+    global _cursorMouseButtons, _x0, _y0;
+    local px, py, res;
+
+    // x = x+_x0; y = y+_y0;
+    res = False;
+
+    if( _cursorMouseButtons & 8 )  // click
+    {
+        px = GetCursorXPosition( 1 );
+        py = GetCursorYPosition( 1 );
+        res = PointInside( px, py, x, y, width, height );
+    }
+
+    return res;
+}
+
+global IDset;
+
+if( typeof( IDset ) == "undefined" ) IDset = 0;
+
+//GuiButton
+function GuiButtonTrigger( ButtonName, x, y, width, height )
+{
+
+    GuiButton( ButtonName, ++IDset, x, y, width, height, 1 );
+
+    id = GuiGetEvent( 0, 0 );
+    event = GuiGetEvent( 0, 1 );
+    clickevent = event == 1;
+    ButtonClicked = id == IDset && clickevent;
+
+    return ButtonClicked;
+}
+click = GetCursorMouseButtons() == 9;
+Px = GetCursorXPosition( 1 );
+Py = GetCursorYPosition( 1 );
+
+GfxSetBkMode( 1 );
+
+// Bo thuc thi procedure
+procedure GfxLabel( text, x, y, width, height, format )
+{
+    GfxSelectFont( "Arial", CellHeight / 3.2, 600 );
+    GfxSetTextColor( colorYellow );
+    GfxDrawText( text, x, y, x + width, y + height, format | DT_VCENTER );
+}
+
+procedure SetOrigin( x0, y0 )
+{
+    global _x0, _y0;
+    _x0 = x0;
+    _y0 = y0;
+}
+procedure GfxSetColors( fgColor, bgColor )
+{
+    GfxSetTextColor( fgColor );
+    GfxSetBkColor( bgColor );
+    GfxSelectPen( fgColor );
+    GfxSelectSolidBrush( bgColor );
+}
+
+function GfxGetState( id )
+{
+    return Nz( StaticVarGet( "GfxState" + id + GetChartID() ), 0 );
+}
+procedure GfxSetState( id, val )
+{
+    StaticVarSet( "GfxState" + id + GetChartID(), val );
+}
+
+//Tao Tab
+function GfxHTabs( id, headers, headheight, x, y, width, height, colorfg, colorbg )
+{
+    local px, choice, na, i, G, header, w, wi, prevwi;
+
+    choice = GfxGetState( id );
+    GfxSetColors( colorfg, colorbg );
+
+    for( G = 0; ( header = StrExtract( headers, G ) ) != ""; ++G ) {};
+
+    w = width / G;
+
+    wi = x;
+
+    prevwi = x;
+
+    if( LeftClickInside( x, y, width, headheight ) )
+    {
+        px = GetCursorXPosition( 1 );
+
+        // choice = floor((px - x)/w);
+        // wi = x; prevwi = x;
+        for( i = 0; ( header = StrExtract( headers, i ) ) != ""; ++i )
+        {
+            wi = wi + ( width + 5 ) / ( StrCount( headers, "," ) + 1 );
+
+            if( ( px > prevwi ) && ( px < wi ) )
+            {
+                choice = i;
+                break;
+            }
+        }
+
+        GfxSetState( id, choice ); // StaticVarSet(na, choice);
+    }
+
+    GfxSetBkMode( 1 );
+    // Draw Zone & Tabs
+    wi = x;
+    prevwi = x;
+
+    for( i = 0; ( header = StrExtract( headers, i ) ) != ""; ++i )
+    {
+        wi = wi + ( width + 5 ) / ( StrCount( headers, "," ) + 1 );;
+        //GfxSelectPen(colorLightYellow,2);
+        // GfxSelectSolidBrush(colorbg);
+        GfxRoundRect( prevwi, y, wi, y + headheight + 5, 5, 5 );
+
+        if( i != choice )
+        {
+
+            GfxRoundRect( prevwi, y, wi, y + headheight + 5, 5, 5 );
+            GfxSelectSolidBrush( colorbg );
+        }
+        else
+        {
+            wic = wi;
+            prevwic = prevwi;
+        }
+
+        GfxSelectFont( "Arial", CellHeight / 2.9, 600 );
+        GfxDrawText( header, prevwi, y, wi, y + headheight + 5, 1 | 4 | 32 );
+        prevwi = wi;
+    }
+
+    return choice;
+}
+
+///////////////////////////////////////////////////
+//Create Table
+//Header
+///////////////////////////////////////////////////
+GfxSelectFont( "Arial", CellHeight / 2 );
+GfxSelectSolidBrush( colorSkyblue );
+GfxRoundRect( x1, y1 - 4, x1 + CellWidth * col * 1.1 + 35, y1 + CellHeight * 1.5, 15, 15 );
+GfxSetTextColor( colorYellow );
+GfxSetBkMode( 1 ); //set transparent mode
+dt = SelectedValue( DateTime() );
+
+// khai bao vnindex
+index_fc = Foreign( "Vnindex", "Close" );
+index_rfc = WriteVal( ROC( index_fc, 1 ), 5.2 );
+index_chg = index_fc - Ref( index_fc, -1 );
+//vni color
+colorindex = IIf( index_fc > Ref( index_fc, -1 ), colorbrightGreen, IIf( index_fc == Ref( index_fc, -1 ), colorGold, colorRed ) );
+GfxSetTextColor( colorindex[BarCount - 1] );
+GfxSelectFont( "Arial", CellHeight / 2, 800 );
+GfxDrawText( "VNINDEX " + index_fc + " " + index_rfc + "%", x1 + BtnOffsetXY, y1 + 5, x1 + CellWidth * 5 + 10, y1 + CellHeight * 2, 1 );
+
+//Tao ON|OFF button
+id = GuiGetEvent( 0, 0 );
+event = GuiGetEvent( 0, 1 );
+MyChartID = GetChartID();
+ToggleButton = Nz( StaticVarGet( "ToggleButton" + MyChartID ) );
+GuiButtonTrigger( "On", x1 + CellWidth * col + 30, y1 + CellHeight / 4 - 5, 35, 25 );
+GuiSetColors( IDset, IDset, 2, colorWhite, colorGreen, colorYellow, colorWhite, colorGreen, colorYellow, colorGold, colorDarkTeal, colorYellow );
+
+
+//Draw Table after click
+///////////////////////////////////////////////////
+GfxSelectFont( "Arial", CellHeight / 3.2 );
+
+//Ham tao DMDT
+function DMDT( TickerList, text, _x0, _y0, CellWidth, CellHeight )
+{
+    GfxSelectSolidBrush( colorDarkGreen );
+    sym_num = StrCount( tickerlist, "|" ) + 1;
+    GfxRoundRect( _x0, _y0 + 10, _x0 + CellWidth * col + 5 * 15, _y0 + CellHeight * ( sym_num + 2 ) + 10, 15, 15 );
+    GfxLabel( text, _x0, _y0 + 10, CellWidth * col + 5 * 15, CellHeight, 1 );
+
+
+    for( i = 0; i < sym_num; i++ )
+    {
+        list = StrExtract( Myasset, i, '|' );
+
+        symbol = StrExtract( list, 0, ',' ) ;
+        Giamua = StrExtract( list, 1, ',' ) ;
+        Stoploss = StrExtract( list, 2, ',' ) ;
+        Target = StrExtract( list, 3, ',' ) ;
+
+
+
+        SetForeign( symbol );
+        fC = close;
+        rfc = ROC( fc, 1 );
+        RestorePriceArrays();
+        fC1 = LastValue( fC );
+        rfc1 = LastValue( rfc );
+        PnL = ( fC1 - StrToNum( giamua ) ) / StrToNum( giamua ) * 100;
+        //Tinh shares
+        shares = floor( ( 200000 * 0.02 ) / ( StrToNum( GiaMua ) - StrToNum( Stoploss ) ) );
+
+
+
+        Cutloss = fC1 < StrToNum( Stoploss );
+        takeprofit = fC1 > StrToNum( Target );
+
+        if( fC1 < StrToNum( Stoploss ) )
+            color = colorRed;
+        else
+            if( fC1 >= StrToNum( Stoploss ) AND fC1 <= StrToNum( giamua ) )
+                color = colorOrange;
+            else
+                if( fC1 <= StrToNum( Target ) AND  fC1 > StrToNum( giamua ) )
+                    color = colorGreen;
+                else
+                    if( fC1 > StrToNum( Target ) )
+                        color = colorLime;
+
+        textname = symbol;
+        textgia = WriteIf( fC1 < 10, "0" + WriteVal( fC1, 1.2 ), WriteVal( fC1, 1.2 ) );
+        //mauneno=ColorBlend( colorLavender, colorLavender, 0 );
+        GfxSelectFont( "Arial", CellHeight / 3.2, 600 );
+        GfxSetTextColor( colorGold );
+
+        GfxDrawText( "Ticker", _x0   , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 6, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "Gia Mua", _x0 + cellWidth * col / 6 , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 3, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "Stoploss", _x0 + cellWidth * col / 3  , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 2, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "Price", _x0 + cellWidth * col / 2 , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 3 * 2, 6 * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( "Target", _x0 + cellWidth * col / 3 * 2  , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 6 * 5, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "R - R %", _x0 + cellWidth * col / 6 * 5 , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col, 3 * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( "Shares", _x0 + cellWidth * col / 2.5 * 5 , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 5, 3 * cellHeight + _y0 + 5 , 1 );
+
+        GfxSelectSolidBrush( color );
+        GfxRoundRect( _x0, _y0 + ( i + 2 ) * cellHeight + 3, _x0 + cellWidth * col / 6 * 7, ( i + 3 ) * cellHeight + _y0 + 4, 15, 15 );
+
+        if( px > _x0 AND px < _x0 + cellWidth * col / 6 * 7 AND py > _y0 + ( i + 2 ) * cellHeight + 3 AND py < ( i + 3 ) * cellHeight + _y0 + 3 AND Click )
+        {
+            AB = CreateObject( "Broker.Application" );
+            doc = AB.ActiveDocument;
+            doc.Name = symbol;
+        }
+
+        GfxSetTextColor( colorBlack );
+        GfxDrawText( textname, _x0   , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 6, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( giamua, _x0 + cellWidth * col / 6 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 3, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( stoploss, _x0 + cellWidth * col / 3  , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 2, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+
+        GfxDrawText( textgia, _x0 + cellWidth * col / 2 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 3 * 2, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( target, _x0 + cellWidth * col / 3 * 2  , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 6 * 5, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+
+        GfxDrawText( StrFormat( "%s  %.1f%%", "  ", Pnl ), _x0 + cellWidth * col / 6 * 5 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( WriteVal( shares, 1.0 ), _x0 + cellWidth * col / 2.5 * 5 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 5, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
+
+
+    }
+}
+
+//Ham tao DMTD
+function DMTD( TickerList, text, _x0, _y0, CellWidth, CellHeight )
+{
+    GfxSelectSolidBrush( colorDarkGreen );
+    sym_num = StrCount( tickerlist, "|" ) + 1;
+    GfxRoundRect( _x0, _y0 + 10, _x0 + CellWidth * col * 1.1 + 35, _y0 + CellHeight * ( sym_num + 2 ) + 10, 15, 15 );
+    GfxLabel( text, _x0, _y0 + 10, CellWidth * col, CellHeight, 1 );
+
+    for( i = 0; i < wl_count; i++ )
+    {
+        list = StrExtract( MyWL, i, '|' );
+
+        symbol = StrExtract( list, 0, ',' ) ;
+        pivot = StrExtract( list, 1, ',' ) ;
+
+        SetForeign( symbol );
+        fC = close;
+        rfc = ROC( fc, 1 );
+        GTGD = V * C;
+        DBKL = V / MA( V, 50 ) * 100 ;
+        RestorePriceArrays();
+
+
+        RestorePriceArrays();
+        fC1 = LastValue( fC );
+        rfc1 = LastValue( rfc );
+
+        breakout = fC1 > StrToNum( pivot );
+
+        if( breakout )
+            color = colorLime;
+        else color = colorGold;
+
+        textname = symbol;
+        textgia = WriteIf( fC1 < 10, "0" + WriteVal( fC1, 1.2 ), WriteVal( fC1, 1.2 ) );
+        //mauneno=ColorBlend( colorLavender, colorLavender, 0 );
+        GfxSelectFont( "Arial", CellHeight / 3.2, 600 );
+        GfxSetTextColor( colorGold );
+        //Ticker    Gia      %       GTGD         %DBKL   Pivot",_x0 +8 , _y0 + cellHeight+5, _x0+cellWidth*col, _y0+2*cellHeight+5, 0)//
+
+        GfxDrawText( "Ticker", _x0   , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 6, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "Gia", _x0 + cellWidth * col / 6 - 30 , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 3, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "    %", _x0 + cellWidth * col / 6  , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 2, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "GTGD", _x0 + cellWidth * col / 2 - 30, _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 3 * 2, 6 * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( "        % DBKL", _x0 + cellWidth * col / 3 * 2 - 20  , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col / 6 * 5, 3 * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( "Pivot", _x0 + cellWidth * col / 6 * 5 , _y0 + 1 * cellHeight +  5, _x0 + cellWidth * col - 10, 3 * cellHeight + _y0 + 5 , 2 );
+
+        GfxSelectSolidBrush( color );
+        GfxRoundRect( _x0, _y0 + ( i + 2 ) * cellHeight + 3, _x0 + cellWidth * col, ( i + 3 ) * cellHeight + _y0 + 3, 15, 15 );
+
+        if( px > _x0 AND px < _x0 + cellWidth * col AND py > _y0 + ( i + 2 ) * cellHeight + 3 AND py < ( i + 3 ) * cellHeight + _y0 + 3 AND Click )
+        {
+            AB = CreateObject( "Broker.Application" );
+            doc = AB.ActiveDocument;
+            doc.Name = symbol;
+        }
+
+        GfxSetTextColor( colorBlack );
+        GfxDrawText( textname, _x0   , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 6, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( textgia, _x0 + cellWidth * col / 6 - 30 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 3, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+        GfxDrawText( StrFormat( "%s  %.1f%%", "    ", rfc1 ), _x0 + cellWidth * col / 6 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 2, ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( numtostr( GTGD, 4.0 ), _x0 + cellWidth * col / 2 - 30  , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 3 * 2 + 10, ( i + 3 ) * cellHeight + _y0 + 5, 1 );
+
+        GfxDrawText( StrFormat( "%s  %.1f%%", "    ", DBKL ), _x0 + cellWidth * col / 3 * 2 - 20 , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col / 6 * 5 + 20    , ( i + 3 ) * cellHeight + _y0 + 5 , 1 );
+        GfxDrawText( pivot, _x0 + cellWidth * col / 6 * 5  , _y0 + ( i + 2 ) * cellHeight +  5, _x0 + cellWidth * col - 10, ( i + 3 ) * cellHeight + _y0 + 5, 2 );
+
+    }
+}
+
+procedure GfxHT( x, y )
+{
+    SetOrigin( x1, y1 + CellHeight * 3 );
+    G = GfxHTabs( "HTab1", "DANH MUC", 30, _x0, _y0 - CellHeight - 10, CellWidth * col * 1.1 + 30, CellHeight, colorWhite, colorViolet );
+
+
+    DMDT( Myasset, " DANH MUC DAU TU", _x0, _y0 - 9, CellWidth, CellHeight );
+    DMTD( MyWL, "DANH MUC THEO DOI", _x0, _y0 + CellHeight * asset_count + 2 * CellHeight - 9, CellWidth, CellHeight );
+}
+
+//Event Control button quen click
+if( id == IDset AND event == 1 )  // If ToggleButton is clicked
+{
+    if( ToggleButton ) StaticVarSet( "ToggleButton" + MyChartID, ToggleButton = 0, 0 );
+    else  StaticVarSet( "ToggleButton" + MyChartID, ToggleButton = 1, 0 );
+}
+
+if( ToggleButton )
+{
+
+    GuiSetText( "On", IDset );
+    GfxHT( x1, y1 + CellHeight * 3 );
+}
+
+else
+{
+    GuiSetText( "Off", IDset );
+    GuiSetColors( IDset, IDset, 1, colorWhite, colorRed, colorYellow, colorWhite, colorGreen, colorYellow, colorGold, colorDarkTeal, colorYellow );
+}
+
+///////////////////////////////////////////////////
+// Tao diem gia High and Low tren do thi
+_SECTION_BEGIN("Pivot high low");
+//Diem Pivot , de lam gi ?
+procedure alternate_proc(pk,tr,sumpk,sumtr){
+
+	global pkg;
+	global trg;
+	
+	pkg = pk;
+	trg = tr;
+	idxpk = 0;
+    idxtr = 0;
+    flgtr = 0;
+    flgpk = 0;
+    
+    for( i = 1; i < BarCount; i++ )
+    {
+        if( pk[i] AND sumpk[i] == 1 AND !tr[i] AND flgpk == 0 )
+        {
+            idxpk = i;
+            flgtr = 0;
+        }
+        else
+            if( ( pk[i] AND sumpk[i] > 1 AND !tr[i] ) OR( pk[i] AND flgpk == 1 ) )
+            {
+                if( H[i] > H[idxpk] )
+                {
+                    pkg[idxpk] = 0;
+                    idxpk = i;
+                    flgpk = 0;
+                }
+                else
+                    if( H[i] <= H[idxpk] )
+                    {
+                        pkg[i] = 0;
+                        flgpk = 0;
+                    }
+            }
+            else
+                if( tr[i] AND sumtr[i] == 1 AND !pk[i] AND flgtr == 0 )
+                {
+                    idxtr = i;
+                    flgpk = 0;
+                }
+                else
+                    if( ( tr[i] AND sumtr[i] > 1 AND !pk[i] ) OR( tr[i] AND flgtr == 1 ) )
+                    {
+                        if( L[i] < L[idxtr] )
+                        {
+                            trg[idxtr] = 0;
+                            idxtr = i;
+                            flgtr = 0;
+                        }
+                        else
+                            if( L[i] >= L[idxtr] )
+                            {
+                                trg[i] = 0;
+                                flgtr = 0;
+                            }
+                    }
+                    else
+                        if( pk[i] AND tr[i] )
+                        {
+                            if( sumpk[i - 1] > sumtr[i - 1] )
+                            {
+                                pkg[i] = 0;
+                                flgtr = 1;
+                                idxtr = i;
+                            }
+                            else
+                                if( sumtr[i - 1] > sumpk[i - 1] )
+                                {
+                                    trg[i] = 0;
+                                    flgpk = 1;
+                                    idxpk = i;
+                                }
+                        }
+    }
+
+}
+
+
+
+// Fractal Pivots
+x = bi = BarIndex();
+fvb = FirstVisibleValue( bi );
+lvb = LastVisibleValue( bi );
+
+rightstrength = Param( "Right Strength",8,2, 50, 1 );
+leftstrength = Param( "Left Strength", 2, 2, 50, 1 );
+
+
+pk = H == HHV( H, leftstrength ) AND Ref( HHV( H, rightstrength ), rightstrength ) < H;
+tr = L == LLV( L, leftstrength ) AND Ref( LLV( L, rightstrength ), rightstrength ) > L;
+
+sumpk = Sum( pk, BarsSince( tr ) );
+sumtr = Sum( tr, BarsSince( pk ) );
+alternate_proc( pk, tr, sumpk, sumtr );
+pk = pkg;
+tr = trg;
+
+for( i = 0; i < 3; i++ )
+{
+    VarSet( "px" + i, ValueWhen( pk, bi, i ) );
+    VarSet( "tx" + i, ValueWhen( tr, bi, i ) );
+    VarSet( "ph" + i, ValueWhen( pk, H, i ) );
+    VarSet( "tl" + i, ValueWhen( tr, L, i ) );
+}
+
+ll = tr AND tl1 < tl2;
+hl = tr AND tl1 > tl2;
+hh = pk AND ph1 > ph2;
+lh = pk AND ph1 < ph2;
+dt = pk AND ph1 == ph2;
+db = tr AND tl1 == tl2;
+
+
+clrpk = colorblack;
+clrtr = colorblack;
+
+for( i = lvb; i > fvb; i-- )
+{
+    // troughs
+    if( ll[i] )
+    {
+        str = "" + WriteVal(L[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, L[i], clrtr, colorDefault, -30 );
+    }
+
+    if( hl[i] )
+    {
+        str = "" + WriteVal(L[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, L[i], clrtr, colorDefault, -30 );
+    }
+
+    if( db[i] )
+    {
+        str = "DB";
+        PlotTextSetFont( str, "Arial", 8, i, L[i], clrtr, colorDefault, -30 );
+    }
+
+    //peaks
+    if( hh[i] )
+    {
+        str = ""+WriteVal(H[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, H[i], clrpk, colorDefault, 20 );
+    }
+
+    if( lh[i] )
+    {
+        str = "" +WriteVal(H[i],8.2);
+        PlotTextSetFont( str, "Arial", 8, i, H[i], clrpk, colorDefault, 20 );
+    }
+
+    if( dt[i] )
+    {
+        str = "DT";
+        PlotTextSetFont( str, "Arial", 8, i, H[i], clrpk, colorDefault, 20 );
+    }
+}
+
+GraphXSpace = 8;
+
+
+
+///////////////////////////////////////////////////
+//1. Ve Chart Chinh
+_SECTION_BEGIN( "Price Chart" );
+GraphLabelDecimals = 2;
+SetChartOptions( 0, chartShowArrows | chartShowDates );
+
+_N( Title = " " + EncodeColor( colorViolet ) + Name() + " - " + EncodeColor( colorBlue ) + FullName() + " - " + EncodeColor( colorBlack ) + IndustryID( 1 ) + EncodeColor( colorGreen ) + "  | C:  " + WriteVal( C, 1.2 ) + "  " + " (" + WriteVal( ROC( C, 1 ), 1.1 ) + "%) " + EncodeColor( colorGrey40 ) + " | V:  " + EncodeColor( colorDarkGreen ) + WriteVal( V, 1.0 ) );
+
+//Type Chart
+TypeofPrice = ParamList( "Type of Price", "Candle Stick,Bar Chart", 0 );
+
+switch( TypeofPrice )
+{
+case "Candle Stick":
+    upcolor = ParamColor( "Up color", colorWhite );
+    downcolor = ParamColor( "Down color", colorBlack );
+    barcolor = ParamColor( "Bar color", colorBlack );
+    SetBarFillColor( IIf( C > O, upcolor, downcolor ) );
+    PlotOHLC( Open, High, Low, Close, " ", barcolor, styleCandle + styleNoTitle, minv, hhvv * 9 );
+    GraphXSpace = 15;
+    break;
+
+case "Bar Chart":
+    BarColor = IIf( C > Ref( C, -1 ), ColorRGB( 46, 82, 173 ), ColorRGB( 238, 82, 160 ) );
+    PlotOHLC( Close,  High,  Low,  Close, "", BarColor, styleBar + styleThick, minv, hhvv * 9, 0, 0, 2 );
+
+    break;
+
+
+}
+
+_SECTION_END();
+
+///////////////////////////////////////////////////
+// 2. Them EMA vao do thi
+_SECTION_BEGIN( "EMA" );
+
+ema1 = Param( "Chu Ky", 21, 1, 200, 1 );
+Plot( EMA( C, ema1 ), "EMA" + ema1, colorRed, styleThick );
+
+_SECTION_END();
+
+//////////////////////////////////////////////////
+
+_SECTION_BEGIN( "Volume" );
+//Khong phan biet hoa thuong
+//Them volume vao do thi
+Vdn = IIf( C < Ref( C, -1 ), V, 0 );
+Vup = IIf( C > Ref( C, -1 ), V, 0 );
+hvup10 = HHV( vup, 10 );
+hv10 = HHV( vdn, 10 );
+VAV = MA( V, Param( "TB Vol", 21, 1, 200, 1 ) );
+
+colorPricechg = IIf(upday,colorGreen,colorred);
+TypeofVol  = ParamList("Type of Volume","standard, pivot pocket volume",0);
+switch(TypeofVol)
+{
+
+	case "pivot pocket volume":
+	color=IIf( C > Ref(C,-1) AND V<hv10, ParamColor("Volume up", colorGreen ), IIf(C>Ref(C,-1) AND V>hv10,ParamColor("Pivot Pocket", colorBrightGreen)  ,IIf(C<Ref(C,-1) AND V>hvup10,ParamColor("Max Volumn down",ColorRGB(0,253,251)),ParamColor("Volume down",colorred))));
+	
+	break;
+      
+   
+    case "standard":
+    color = IIf(C>= Ref(C,-1),ParamColor("Volume up", colorGreen ),ParamColor("Volume down",colorred));
+    break;
+}
+//Plot Volume and Caculator Vol 30
+
+SetBarFillColor( color );
+Plot( V, _DEFAULT_NAME(), ParamColor( "color Volume", colorWhite ), styleArea | styleOwnScale | styleNoLabel, minv, hhvv * 9 );
+CHANGE = ( ( C - Ref( C, -1 ) ) / Ref( C, -1 ) ) * 100;
+Plot( VAV, "Vol TB 21 Day", colorBlue, styleLine | styleOwnScale | styleNoLabel, minv, hhvv * 7, 0, 10 );
+
+_SECTION_END();
+
+
+
+_SECTION_BEGIN("Relative Strength");
+
+//Fix percent for Up band
+//percent = Param("Percent MA",0.1,0.01,0.5,0.01);
+
+//ATR for Up Band
+//periods = Param( "Periods", 15, 1, 200, 1 );
+//ATRs = ATR(periods) - 0.5;
+
+//Relative Strength
+base = ParamStr("RS base ticker", "VNINDEX" );
+RS = RelStrength("VNINDEX");
+
+
+//Up_MA = MA_base * (1+percent);
+//Up_MA = MA_base * (1+ATRs);
+
+//Keltner Band Code
+KMid = MA (RS, 20);  //Middle Line
+ATRPeriod = 10;         //ATR Period
+KFactor = 1.0;            //Multiplier
+KValue = ATR(ATRPeriod) * KFactor; 
+KTop = KMid + KValue;   //Upper Band
+KBottom = KMid - KValue;    //Lower Band
+Plot_Kel = ParamToggle( "Wanna Keltner Channel ?","No| Yes",0);
+if (Plot_Kel >0) {Plot(KTop,"Keltner UpBand",colorGreen);}
+
+//Plot MA for RS
+PlotMA_ngan = ParamToggle( "Wanna Short term MA ?","No| Yes",1); 
+PlotMA_dai = ParamToggle( "Wanna Long term MA ?","No| Yes",1);
+MAA=Param("Short term MA for RS",13,1,200,1);
+MAA_long=Param("Long term MA for RS",49,1,200,1);
+MA_base = MA(RS,MAA);
+MA_base_long = MA(RS,MAA_long);
+if (PlotMA_ngan >0) {Plot(MA_base,"Short term MA",colorGrey40,styleNoLabel);}
+if (PlotMA_dai >0) {Plot(MA_base_long,"Long term MA",colorRed,styleNoLabel);}
+
+Plot( RS, _SECTION_NAME() + "(" + base + ")", ParamColor( "RS Color", colorBlue ), ParamStyle("RS Style",styleThick)  );
+
+//Plot( MA_base, "MA" + "(" + MA_base + ")", ParamColor( "MA Color", colorRed ));
+//Plot( Up_MA, _SECTION_NAME() + "(" + Up_MA + ")", ParamColor( "color Up Band", colorRed ), ParamStyle("Style Upband")  );
+
+//Keltner Band
+//Plot( KTop, "Keltner Band" + "(" + KTop + ")", ParamColor( "Keltner Color", colorGreen ));
+
+
+Filter = RS > MA_base_long AND V > 50000;
+
+
+_SECTION_END();
